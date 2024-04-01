@@ -9,6 +9,7 @@ En la raíz del proyecto se podrá encontrar el archivo documentation.swagger.ym
 ![Alt text](image.png)
 
 Adicionalmente se adjunta lor CURL para ser importados en postman 
+
 Crear Post :
 
 ```
