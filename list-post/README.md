@@ -22,20 +22,18 @@ Depending on your preferred package manager, follow the instructions below to de
 
 ## Test your service
 
-This template contains a single lambda function triggered by an HTTP request made on the provisioned API Gateway REST API `/hello` route with `POST` method. The request body must be provided as `application/json`. The body structure is tested by API Gateway against `src/functions/hello/schema.ts` JSON-Schema definition: it must contain the `name` property.
+This template contains a single lambda function triggered by an HTTP request made on the provisioned API Gateway REST API `/post` route with `GET` method. The request body must be provided as `application/json`. The body structure is tested by API Gateway against `src/functions/list-post/schema.ts` .
 
-- requesting any other path than `/hello` with any other method than `POST` will result in API Gateway returning a `403` HTTP error code
-- sending a `POST` request to `/hello` with a payload **not** containing a string property named `name` will result in API Gateway returning a `400` HTTP error code
-- sending a `POST` request to `/hello` with a payload containing a string property named `name` will result in API Gateway returning a `200` HTTP status code with a message saluting the provided name and the detailed event processed by the lambda
-
-> :warning: As is, this template, once deployed, opens a **public** endpoint within your AWS account resources. Anybody with the URL can actively execute the API Gateway endpoint and the corresponding lambda. You should protect this endpoint with the authentication method of your choice.
 
 ### Locally
+Run `sls offline` to install the project dependencies and execute request with postman
+
+or
 
 In order to test the hello function locally, run the following command:
 
-- `npx sls invoke local -f hello --path src/functions/hello/mock.json` if you're using NPM
-- `yarn sls invoke local -f hello --path src/functions/hello/mock.json` if you're using Yarn
+- `npx sls invoke local -f hello --path src/functions/list-post/mock.json` if you're using NPM
+- `yarn sls invoke local -f hello --path src/functions/list-post/mock.json` if you're using Yarn
 
 Check the [sls invoke local command documentation](https://www.serverless.com/framework/docs/providers/aws/cli-reference/invoke-local/) for more information.
 
@@ -44,11 +42,7 @@ Check the [sls invoke local command documentation](https://www.serverless.com/fr
 Copy and replace your `url` - found in Serverless `deploy` command output - and `name` parameter in the following `curl` command in your terminal or in Postman to test your newly deployed application.
 
 ```
-curl --location --request POST 'https://myApiEndpoint/dev/hello' \
---header 'Content-Type: application/json' \
---data-raw '{
-    "name": "Frederic"
-}'
+curl --location 'http://localhost:3000/dev/post/'
 ```
 
 ## Template features
@@ -64,11 +58,11 @@ The project code base is mainly located within the `src` folder. This folder is 
 .
 ├── src
 │   ├── functions               # Lambda configuration and source code folder
-│   │   ├── hello
-│   │   │   ├── handler.ts      # `Hello` lambda source code
-│   │   │   ├── index.ts        # `Hello` lambda Serverless configuration
-│   │   │   ├── mock.json       # `Hello` lambda input parameter, if any, for local invocation
-│   │   │   └── schema.ts       # `Hello` lambda input event JSON-Schema
+│   │   ├── create-post
+│   │   │   ├── handler.ts      # `list-post` lambda source code
+│   │   │   ├── index.ts        # `list-post` lambda Serverless configuration
+│   │   │   ├── mock.json       # `list-post` lambda input parameter, if any, for local invocation
+│   │   │   └── schema.ts       # `list-post` lambda input event JSON-Schema
 │   │   │
 │   │   └── index.ts            # Import/export of all lambda configurations
 │   │
@@ -84,12 +78,7 @@ The project code base is mainly located within the `src` folder. This folder is 
 └── webpack.config.js           # Webpack configuration
 ```
 
-### 3rd party libraries
+### Despliegue
+- Configure credentials of the AWS account where the deployment will be carried out with `sls config credentials`
+- Run `sls deploy` to deploy project 
 
-- [json-schema-to-ts](https://github.com/ThomasAribart/json-schema-to-ts) - uses JSON-Schema definitions used by API Gateway for HTTP request validation to statically generate TypeScript types in your lambda's handler code base
-- [middy](https://github.com/middyjs/middy) - middleware engine for Node.Js lambda. This template uses [http-json-body-parser](https://github.com/middyjs/middy/tree/master/packages/http-json-body-parser) to convert API Gateway `event.body` property, originally passed as a stringified JSON, to its corresponding parsed object
-- [@serverless/typescript](https://github.com/serverless/typescript) - provides up-to-date TypeScript definitions for your `serverless.ts` service file
-
-### Advanced usage
-
-Any tsconfig.json can be used, but if you do, set the environment variable `TS_NODE_CONFIG` for building the application, eg `TS_NODE_CONFIG=./tsconfig.app.json npx serverless webpack`
